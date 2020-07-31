@@ -57,13 +57,6 @@ export class FilterService {
     return queryString;
   }
 
-  public getDefaultOffsetString(): string {
-    return BuildQueryString({
-      limit: this.postPerPage,
-      offset: 0,
-    });
-  }
-
   // private functions
   private handleFilterStatus(): void {
 
