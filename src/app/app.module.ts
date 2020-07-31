@@ -1,14 +1,23 @@
-import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { FilterService } from './services/filtering-service.service';
+import { HttpClientModule } from '@angular/common/http';
+import { UserService } from './services/user-service';
 
 @NgModule({
-  imports: [BrowserModule, FormsModule],
-  declarations: [AppComponent],
-  bootstrap: [AppComponent],
-  providers: [FilterService]
+  declarations: [
+    AppComponent,
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule
+  ],
+  providers: [
+    UserService,
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

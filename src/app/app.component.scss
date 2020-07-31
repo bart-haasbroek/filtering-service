@@ -1,0 +1,44 @@
+.container {
+  width: 960px;
+  margin: 0 auto;
+}
+
+.post-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+}
+
+.post {
+  background: #efefef;
+  padding: 0 16px;
+}
+
+input {
+  display: block;
+  padding: 8px 10px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  &:focus {
+    outline: none;
+  }
+}
+
+button {
+  display: block;
+  border: 1px solid;
+  padding: 8px 10px 10px;
+  font-size: 16px;
+  background: none;
+  -webkit-appearance: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.button-container {
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+}

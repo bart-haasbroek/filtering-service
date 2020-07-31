@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, Inject } from '@angular/core';
 import { scan, mapTo, startWith, debounceTime, map, withLatestFrom, tap } from 'rxjs/operators';
 import { Subject, merge, combineLatest, BehaviorSubject } from 'rxjs';
 
@@ -8,23 +8,30 @@ export interface FilterInterface {
 }
 
 @Injectable()
-export class FilterService {
-  private onMoreButtonClick$: any = new Subject;
-  private filterUpdater$: any = new Subject;
-  private resetFilter$: any = new Subject;
-  public onFilterUpdate$: any = new Subject;
+export class FilteringService {
+  private onMoreButtonClick$: any = new Subject();
+  private filterUpdater$: any = new Subject();
+  private resetFilter$: any = new Subject();
+  public onFilterUpdate$: any = new Subject();
   public currentFilter$: any = new BehaviorSubject(null);
-  public postPerPage: number = 5;
-  constructor() {
+  public postPerPage: number = 20;
+  public paginationKeys: any;
+
+  constructor(
+    @Inject('filterServiceConfig') filterServiceConfig: any
+  ) {
+    this.postPerPage = filterServiceConfig.postsPerPage;
+    this.paginationKeys = filterServiceConfig.paginationKeys;
     this.handleFilterStatus();
+    this.filterUpdater$.next({});
   }
 
 
   // Public functions
-  public addToFilter(key: string, value: string): void {
+  public addToFilter(filter: FilterInterface): void {
     this.filterUpdater$.next({
-      key: key,
-      value: value
+      key: filter.key,
+      value: filter.value
     });
   }
 
@@ -45,7 +52,7 @@ export class FilterService {
     let queryString: string = '';
     let counter: number = 0;
     for (const key in obj) {
-      const seperator: string = '&';
+      const seperator: string = !queryString.includes('?') ? '?' : '&';
       const property: string = key;
       const value: string = obj[key];
       queryString += `${seperator}${property}=${value}`;
@@ -81,12 +88,12 @@ export class FilterService {
     const offsetStatus$ = offsetCounter$.pipe(
       scan((prev: any, counter: number) => {
         return {
-          limit: this.postPerPage,
-          offset: this.postPerPage * counter
+          _start: this.postPerPage * counter,
+          _limit: this.postPerPage,
         };
       }, {
-        limit: this.postPerPage,
-        offset: 0,
+        _start: 0,
+        _limit: this.postPerPage,
       })
     );
 
@@ -108,7 +115,7 @@ export class FilterService {
           if (curr.reset) {
             return this.resetting(curr.filterToAdd);
           }
-          return curr.filterToAdd ? this.updateFilters(prev, curr.filterToAdd.key, curr.filterToAdd.value, true, curr.reset) : {};
+          return curr.filterToAdd ? this.updateFilters(prev, curr.filterToAdd.key, curr.filterToAdd.value, true) : {};
         }, {}),
         startWith({})
       );
@@ -163,15 +170,8 @@ export class FilterService {
     return newFilters;
   }
 
-  private updateFilters = (currentObj: any, key: string, value: string, toggleSameValue?: boolean, reset?: boolean) => {
+  private updateFilters = (currentObj: any, key: string, value: string, toggleSameValue?: boolean) => {
     const objectIsPreset: boolean = !!currentObj[key] && currentObj[key] === value;
-    if (reset) {
-      if (objectIsPreset) {
-        return {};
-      }
-      currentObj = {};
-    }
-
     let newObject: any;
     if (!value) {
       const { [key]: label, ...rest } = currentObj;

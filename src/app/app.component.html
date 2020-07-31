@@ -1,4 +1,33 @@
-<hello name="{{ name }}"></hello>
-<p>
-  Start editing to see some magic happen :)
-</p>
+<div class="container">
+
+  <h1>
+    Posts overview:
+  </h1>
+
+  User id:
+  <input
+    type=number
+    placeholder="Type your user id here"
+    [(ngModel)]="userId"
+    (change)="addFilter()"
+  >
+
+  <div class="post-wrapper">
+    <ng-container *ngIf="posts.length > 0 else noPosts">
+      <div class="post" *ngFor="let post of posts">
+        <h2>
+          {{post.title}}
+        </h2>
+        Posted by user with id: {{post.userId}}
+        <p>{{post.body}}</p>
+      </div>
+    </ng-container>
+    <ng-template #noPosts>
+      <p>No posts are found</p>
+    </ng-template>
+  </div>
+
+  <div class="button-container">
+    <button (click)="filteringService.addMore()">Load more</button>
+  </div>
+</div>
